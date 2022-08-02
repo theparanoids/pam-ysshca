@@ -1,0 +1,31 @@
+# Copyright 2022 Yahoo Inc.
+# Licensed under the terms of the Apache License 2.0. Please see LICENSE file in project root for terms.
+
+name: license check
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - uses: actions/checkout@v3
+
+      - name: Install addlicense
+        run: go install github.com/google/addlicense@latest
+
+      - name: Check license headers
+        run: |
+          set -e
+          addlicense -l apache -c 'Yahoo,' -ignore "third_party/**" -v *
+          git diff --exit-code
+

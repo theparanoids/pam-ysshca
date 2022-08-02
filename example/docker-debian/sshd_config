@@ -1,0 +1,38 @@
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+Port 22
+Protocol 2
+
+Banner /etc/ssh/sshd-banner
+
+HostKey /ssh-crt/hostkey
+HostCertificate /ssh-crt/hostkey-cert.pub
+
+# Authentication:
+AuthenticationMethods publickey
+ChallengeResponseAuthentication no
+GSSAPIAuthentication no
+HostbasedAuthentication no
+KerberosAuthentication no
+PasswordAuthentication no
+PubkeyAuthentication yes
+
+# Authorization:
+# TrustedUserCAKeys includes the user SSH CA public key from Crypki.
+TrustedUserCAKeys /ssh-user/ysshca_uca
+# Use `AuthorizedPrincipalsFile` and `AuthorizedKeysFile` to enforce SSHD accept YSSHCA credentials only.
+# Comment out the 2 fields if you wish to use other SSH credentials.
+# AuthorizedPrincipalsFile lists YSSHCA style principal names (:touch/:notouch) that are accepted.
+AuthorizedPrincipalsFile /etc/ssh/additional_authorized_principals/%u
+# AuthorizedKeysFile contains keys for public key authentication;
+# We set the field here to rule out the public keys stored at the default folder `~/.ssh/authorized_keys`.
+# Comment it out if you wish to use other SSH credentials.
+AuthorizedKeysFile /etc/ssh/headless_authorized_keys/%u
+
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+
+AcceptEnv LANG LC_*
+X11Forwarding yes
+Subsystem	sftp	/usr/libexec/openssh/sftp-server

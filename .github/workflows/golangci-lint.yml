@@ -1,0 +1,22 @@
+# Copyright 2022 Yahoo Inc.
+# Licensed under the terms of the Apache License 2.0. Please see LICENSE file in project root for terms.
+
+name: golangci-lint
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  golangci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - uses: actions/checkout@v3
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3.1.0
