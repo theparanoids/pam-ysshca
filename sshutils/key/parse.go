@@ -4,7 +4,7 @@
 package key
 
 import (
-	"github.com/theparanoids/pam-ysshca/sshutils/key"
+	"github.com/theparanoids/ysshra/sshutils/key"
 	"golang.org/x/crypto/ssh"
 )
 
