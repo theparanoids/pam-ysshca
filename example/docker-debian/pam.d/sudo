@@ -1,0 +1,7 @@
+#%PAM-1.0
+
+# Set up user limits from /etc/security/limits.conf.
+session    required   pam_limits.so
+
+# Use pam_sshca to authenticate sudo.
+auth   [success=done default=die]   pam_sshca.so
