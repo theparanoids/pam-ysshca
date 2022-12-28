@@ -10,6 +10,9 @@ on:
 env:
   CODEQL_EXTRACTOR_GO_BUILD_TRACING: true
 
+permissions:  # added using https://github.com/step-security/secure-workflows
+  contents: read
+
 jobs:
   analyze:
     name: Analyze
@@ -26,17 +29,22 @@ jobs:
         language: [ 'go' ]
 
     steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+      with:
+        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
     - name: Checkout repository
-      uses: actions/checkout@v3 # v2.4.0
+      uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0 # v2.4.0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@959cbb7472c4d4ad70cdfe6f4976053fe48ab394 # v2.1.37
       with:
         languages: ${{ matrix.language }}
 
     - name: Utilize Go Module Cache
-      uses: actions/cache@v3 # v3.0.3
+      uses: actions/cache@4723a57e26efda3a62cbde1812113b730952852d # v3.2.2 # v3.0.3
       with:
         path: |
           ~/go/pkg/mod
@@ -46,7 +54,7 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Set correct version of Golang to use during CodeQL run
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # v3.5.0
       with:
         go-version: '1.19.4'
         check-latest: true
@@ -54,7 +62,7 @@ jobs:
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@959cbb7472c4d4ad70cdfe6f4976053fe48ab394 # v2.1.37
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -68,4 +76,4 @@ jobs:
     #   make release
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2 # v2.1.14
+      uses: github/codeql-action/analyze@959cbb7472c4d4ad70cdfe6f4976053fe48ab394 # v2.1.37 # v2.1.14
