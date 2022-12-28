@@ -8,15 +8,25 @@ on:
     tags:
     - 'v[0-9]+.[0-9]+.[0-9]+'
 
+permissions:  # added using https://github.com/step-security/secure-workflows
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: write  # for actions/create-release to create a release
     runs-on: ubuntu-latest
     steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+      with:
+        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
     - name: install go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # v3.5.0
       with:
         go-version: 1.19.4
 
@@ -30,7 +40,7 @@ jobs:
        tar -czvf pam_sshca-${{ steps.v.outputs.tag }}-linux.tar.gz --transform 's,^,pam_sshca-${{ steps.v.outputs.tag }}-${OS}/,' pam_sshca
     - name: create release
       id: create-release
-      uses: actions/create-release@v1
+      uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -40,7 +50,7 @@ jobs:
         prerelease: false
 
     - name: upload linux binary
-      uses: actions/upload-release-asset@v1.0.2
+      uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
