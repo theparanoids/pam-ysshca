@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        go: [ '1.17.x', '1.18.x' ]
+        go: [ '1.18.x', '1.19.x' ]
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -43,11 +43,14 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
+      - name: Install required packages
+        run: sudo apt-get install -y libpam0g-dev
+
       - name: Run Go vet
         run: go vet -v ./...
 
       - name: Run Go build
-        run: go build -o ./_build  ./cmd/...
+        run: go build ./cmd/...
 
       - name: Run Go tests
         run: go test -covermode atomic -coverprofile coverage.txt ./...

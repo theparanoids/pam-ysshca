@@ -18,7 +18,7 @@ jobs:
     - name: install go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.18
+        go-version: 1.19.4
 
     - name: get version
       id: v
@@ -26,8 +26,8 @@ jobs:
 
     - name: build
       run: |
-       go build ./cmd/crypki
-       tar -czvf crypki-${{ steps.v.outputs.tag }}-linux.tar.gz --transform 's,^,crypki-${{ steps.v.outputs.tag }}-${OS}/,' crypki
+       go build ./cmd/pam_sshca
+       tar -czvf pam_sshca-${{ steps.v.outputs.tag }}-linux.tar.gz --transform 's,^,crypki-${{ steps.v.outputs.tag }}-${OS}/,' pam_sshca
     - name: create release
       id: create-release
       uses: actions/create-release@v1
@@ -45,6 +45,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: crypki-${{ steps.v.outputs.tag }}-linux.tar.gz
-        asset_name: crypki-${{ steps.v.outputs.tag }}-linux.tar.gz
+        asset_path: pam_sshca-${{ steps.v.outputs.tag }}-linux.tar.gz
+        asset_name: pam_sshca-${{ steps.v.outputs.tag }}-linux.tar.gz
         asset_content_type: application/gzip

@@ -20,10 +20,6 @@ func (p *parser) raiseErrorf(tok *token, msg string, args ...interface{}) {
 	panic(tok.Position.String() + ": " + fmt.Sprintf(msg, args...))
 }
 
-func (p *parser) raiseError(tok *token, err error) {
-	panic(tok.Position.String() + ": " + err.Error())
-}
-
 func (p *parser) run() {
 	for state := p.parseStart; state != nil; {
 		state = state()

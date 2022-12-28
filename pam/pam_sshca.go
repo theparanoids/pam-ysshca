@@ -148,13 +148,13 @@ func (a *authenticator) authenticate() C.int {
 
 func (a *authenticator) sysLogInfo(m string) {
 	if a.sysLogger != nil {
-		a.sysLogger.Info(m)
+		a.sysLogger.Info(m) //nolint:errcheck
 	}
 }
 
 func (a *authenticator) sysLogWarning(m string) {
 	if a.sysLogger != nil {
-		a.sysLogger.Warning(m)
+		a.sysLogger.Warning(m) //nolint:errcheck
 	}
 }
 
@@ -169,9 +169,9 @@ func Authenticate(pamh *C.pam_handle_t) C.int {
 	// Set correct euid before authentication.
 	// NOTE: https://hackerone.com/reports/204802
 	origEUID := os.Geteuid()
-	defer syscall.Setreuid(-1, origEUID)
+	defer syscall.Setreuid(-1, origEUID) //nolint:errcheck
 	uid := C.GetCurrentUserUID(pamh)
-	syscall.Setreuid(-1, int(uid))
+	syscall.Setreuid(-1, int(uid)) //nolint:errcheck
 
 	authenticator := newAuthenticator(user, home)
 	return authenticator.authenticate()

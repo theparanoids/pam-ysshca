@@ -4,8 +4,6 @@
 package conf
 
 import (
-	"os"
-	"path/filepath"
 	"reflect"
 	"regexp"
 	"testing"
@@ -27,13 +25,6 @@ AuthorizedPrincipalsFile /etc/testAPfile
 AuthorizedPrincipalPrefix screwdriver:
 Prompt touchPolicy=(2|3) Touch YubiKey:
 `
-
-func testConfigFile(t *testing.T) string {
-	tmpConfPath := filepath.Join(t.TempDir(), "stdout")
-	tmpConfFile, _ := os.Create(tmpConfPath)
-	tmpConfFile.Write([]byte(validConfig))
-	return tmpConfPath
-}
 
 func TestParser_extendFilePath(t *testing.T) {
 	tests := []struct {
