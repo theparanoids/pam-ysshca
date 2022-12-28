@@ -29,6 +29,9 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 				// Generate a testing key and insert into ssh agent.
 				sshAgent := agent.NewKeyring()
 				privKey, err := rsa.GenerateKey(rand.Reader, 2048)
+				if err != nil {
+					t.Fatal(err)
+				}
 				if err := sshAgent.Add(agent.AddedKey{PrivateKey: privKey}); err != nil {
 					t.Fatal(err)
 				}
@@ -44,7 +47,9 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				ioutil.WriteFile(staticKeysFile.Name(), ssh.MarshalAuthorizedKey(p), 0644)
+				if err := ioutil.WriteFile(staticKeysFile.Name(), ssh.MarshalAuthorizedKey(p), 0644); err != nil {
+					t.Fatal(err)
+				}
 				return p, sshAgent, conf.Config{
 					AllowStaticKeys: true,
 					StaticKeys:      []string{staticKeysFile.Name()},
@@ -57,6 +62,9 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 				// Generate a testing key and insert into ssh agent.
 				sshAgent := agent.NewKeyring()
 				privKey, err := rsa.GenerateKey(rand.Reader, 2048)
+				if err != nil {
+					t.Fatal(err)
+				}
 				if err := sshAgent.Add(agent.AddedKey{PrivateKey: privKey}); err != nil {
 					t.Fatal(err)
 				}
@@ -67,7 +75,9 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				ioutil.WriteFile(staticKeysFile.Name(), []byte("no valid keys in static keys file"), 0644)
+				if err := ioutil.WriteFile(staticKeysFile.Name(), []byte("no valid keys in static keys file"), 0644); err != nil {
+					t.Fatal(err)
+				}
 				return nil, sshAgent, conf.Config{
 					AllowStaticKeys: true,
 					StaticKeys:      []string{staticKeysFile.Name()},
@@ -133,7 +143,9 @@ func Test_authenticator_authCertificate(t *testing.T) {
 					ValidAfter:      uint64(time.Now().Unix() - 3600),
 					ValidBefore:     uint64(time.Now().Unix() + 3600),
 				}
-				cert.SignCert(rand.Reader, caSigner)
+				if err := cert.SignCert(rand.Reader, caSigner); err != nil {
+					t.Fatal(err)
+				}
 				if err := sshAgent.Add(agent.AddedKey{PrivateKey: private, Certificate: cert}); err != nil {
 					t.Fatal(err)
 				}
@@ -142,7 +154,9 @@ func Test_authenticator_authCertificate(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				caKeyFile.Write(ssh.MarshalAuthorizedKey(cert.SignatureKey))
+				if _, err := caKeyFile.Write(ssh.MarshalAuthorizedKey(cert.SignatureKey)); err != nil {
+					t.Fatal(err)
+				}
 
 				return "valid_user", cert, sshAgent, conf.Config{
 					AllowCertificate: true,
@@ -177,7 +191,9 @@ func Test_authenticator_authCertificate(t *testing.T) {
 					ValidAfter:      uint64(time.Now().Unix() - 3600),
 					ValidBefore:     uint64(time.Now().Unix() + 3600),
 				}
-				cert.SignCert(rand.Reader, invalidCASigner)
+				if err := cert.SignCert(rand.Reader, invalidCASigner); err != nil {
+					t.Fatal(err)
+				}
 				if err := sshAgent.Add(agent.AddedKey{PrivateKey: private, Certificate: cert}); err != nil {
 					t.Fatal(err)
 				}
@@ -194,7 +210,9 @@ func Test_authenticator_authCertificate(t *testing.T) {
 				if err != nil {
 					t.Fatal(t)
 				}
-				caKeyFile.Write(ssh.MarshalAuthorizedKey(validCAPub))
+				if _, err := caKeyFile.Write(ssh.MarshalAuthorizedKey(validCAPub)); err != nil {
+					t.Fatal(err)
+				}
 
 				return "cert_signed_by_invalid_ca", nil, sshAgent, conf.Config{
 					AllowCertificate: true,

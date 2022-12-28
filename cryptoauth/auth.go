@@ -80,7 +80,9 @@ func (a *Authenticator) Authenticate(principal string, syslogger *syslog.Writer)
 	}
 	msg.Printf("\nauthentication successful.\n")
 	if syslogger != nil {
-		syslogger.Info(fmt.Sprintf("Grant: USER=%s, KEYID=(%s)", principal, cert.KeyId))
+		if err := syslogger.Info(fmt.Sprintf("Grant: USER=%s, KEYID=(%s)", principal, cert.KeyId)); err != nil {
+			return fmt.Errorf("syslog write failed, err: %v", err)
+		}
 	}
 	return nil
 }

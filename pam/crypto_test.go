@@ -56,7 +56,9 @@ func testCerts(t *testing.T) []agent.AddedKey {
 			ValidAfter:      uint64(time.Now().Unix() + (i-4)*3600),
 			ValidBefore:     uint64(time.Now().Unix() + (i-3)*3600),
 		}
-		cert.SignCert(rand.Reader, signer)
+		if err := cert.SignCert(rand.Reader, signer); err != nil {
+			t.Fatal(err)
+		}
 		addedCerts = append(addedCerts, agent.AddedKey{PrivateKey: private, Certificate: cert})
 	}
 
@@ -123,7 +125,9 @@ func TestGetValidStaticKeys(t *testing.T) {
 		out += fmt.Sprint(string(ssh.MarshalAuthorizedKey(p)))
 	}
 	// Write keys to the static key file.
-	ioutil.WriteFile(tmp.Name(), []byte(out), 0644)
+	if err := ioutil.WriteFile(tmp.Name(), []byte(out), 0644); err != nil {
+		t.Fatal(err)
+	}
 	// Get all identities from the current ssh-agent.
 	identities, err := getIdentitiesFromSSHAgent(sshagent)
 	if err != nil {
@@ -165,7 +169,9 @@ func TestGetInvalidStaticKeys(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sshagent.Add(agent.AddedKey{PrivateKey: key})
+	if err := sshagent.Add(agent.AddedKey{PrivateKey: key}); err != nil {
+		t.Fatal(err)
+	}
 
 	identities, err := getIdentitiesFromSSHAgent(sshagent)
 	if err != nil {
@@ -204,7 +210,9 @@ func TestGetValidCertificates(t *testing.T) {
 
 	for _, cert := range addedCerts {
 		ca := ssh.MarshalAuthorizedKey(cert.Certificate.SignatureKey)
-		tmp.Write(ca)
+		if _, err := tmp.Write(ca); err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	a := &authenticator{
