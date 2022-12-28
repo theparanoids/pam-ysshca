@@ -12,9 +12,3 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
-
-
-  - package-ecosystem: docker
-    directory: /example/docker-debian
-    schedule:
-      interval: daily
