@@ -27,7 +27,7 @@ jobs:
     - name: build
       run: |
        go build ./cmd/pam_sshca
-       tar -czvf pam_sshca-${{ steps.v.outputs.tag }}-linux.tar.gz --transform 's,^,crypki-${{ steps.v.outputs.tag }}-${OS}/,' pam_sshca
+       tar -czvf pam_sshca-${{ steps.v.outputs.tag }}-linux.tar.gz --transform 's,^,pam_sshca-${{ steps.v.outputs.tag }}-${OS}/,' pam_sshca
     - name: create release
       id: create-release
       uses: actions/create-release@v1
