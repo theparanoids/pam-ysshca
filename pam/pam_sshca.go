@@ -18,12 +18,12 @@ package pam
 // uid_t GetCurrentUserUID(pam_handle_t *pamh);
 // const char *GetCurrentUserName(pam_handle_t *pamh);
 // const char *GetCurrentUserHome(pam_handle_t *pamh);
+//
 import "C"
 
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log/syslog"
 	"net"
 	"os"
@@ -59,6 +59,8 @@ func newAuthenticator(user, home string) *authenticator {
 	config := parser.ParseConfigFile(configPath)
 
 	// Initialize system logger.
+	// FIXME(darwin): sysLogger output is lost on macOS due to
+	// https://github.com/golang/go/issues/59229
 	sysLogger, err := syslog.New(syslog.LOG_AUTHPRIV, "PAM_SSHCA")
 	if err != nil {
 		msg.Printlf(msg.WARN, "Failed to access syslogd, please fix your system logs.")
@@ -74,19 +76,7 @@ func newAuthenticator(user, home string) *authenticator {
 }
 
 func (a *authenticator) authenticate() C.int {
-	cmd, err := ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", os.Getpid()))
-	if err != nil {
-		cmd = []byte("unknown command")
-		msg.Printlf(msg.WARN, "Failed to read /proc/%d/cmdline: %v", os.Getpid(), err)
-	} else if len(cmd) == 0 {
-		cmd = []byte("empty command")
-		msg.Printlf(msg.WARN, "/proc/%d/cmdline is empty", os.Getpid())
-	}
-
-	// Remove '\0' at the end.
-	cmd = cmd[:len(cmd)-1]
-	// Replace '\0' with ' '.
-	cmd = bytes.Replace(cmd, []byte{0}, []byte{' '}, -1)
+	cmd := getCmdLine()
 
 	// Initialize ssh-agent.
 	sshAuthSock, err := sshagent.CheckSSHAuthSock()
@@ -160,6 +150,7 @@ func (a *authenticator) sysLogWarning(m string) {
 
 // Authenticate is the entry of Go language part.
 // It is invoked by pam_sm_authenticate in C language part.
+//
 //export Authenticate
 func Authenticate(pamh *C.pam_handle_t) C.int {
 	// Initialize login variables.
