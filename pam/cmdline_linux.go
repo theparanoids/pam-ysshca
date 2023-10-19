@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/theparanoids/pam-ysshca/msg"
 )
 
 func getCmdLine() []byte {
