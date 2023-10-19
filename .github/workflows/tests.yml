@@ -14,14 +14,14 @@ permissions: read-all
 
 jobs:
   unit-tests:
-    name: Run ${{matrix.go}} unit tests
+    name: Run ${{matrix.go}} unit tests on ${{matrix.os}}
     permissions:
       contents: read
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
-        go: [ '1.18.x', '1.19.x' ]
+        os: [ ubuntu-latest, macos-latest ]
+        go: [ '1.20.x', '1.21.x' ]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
@@ -48,8 +48,15 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Install required packages
+      - name: Install required packages for ubuntu
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install -y libpam0g-dev
+
+      - name: Update xcode
+        if: matrix.os == 'macos-latest'
+        uses: maxim-lobanov/setup-xcode@v1.6.0
+        with:
+          xcode-version: latest-stable
 
       - name: Run Go vet
         run: go vet -v ./...
