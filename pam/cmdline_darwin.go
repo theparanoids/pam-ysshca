@@ -6,11 +6,12 @@ package pam
 import (
 	"encoding/binary"
 	"errors"
-	"github.com/theparanoids/pam-ysshca/msg"
-	"golang.org/x/sys/unix"
 	"os"
 	"strings"
 	"syscall"
+
+	"github.com/theparanoids/pam-ysshca/msg"
+	"golang.org/x/sys/unix"
 )
 
 var unknownCommand = []byte("unknown command")
