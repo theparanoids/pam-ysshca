@@ -76,7 +76,7 @@ func newAuthenticator(user, home string) *authenticator {
 }
 
 func (a *authenticator) authenticate() C.int {
-	cmd := getCmdLine()
+	cmd := getCmdLine(os.Getpid())
 
 	// Initialize ssh-agent.
 	sshAuthSock, err := sshagent.CheckSSHAuthSock()

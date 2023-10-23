@@ -4,21 +4,19 @@
 package pam
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
-	"os"
-	"strings"
 	"syscall"
 
 	"github.com/theparanoids/pam-ysshca/msg"
 	"golang.org/x/sys/unix"
 )
 
-var unknownCommand = []byte("unknown command")
-
-func getCmdLine() []byte {
-	data, err := unix.SysctlRaw("kern.procargs2", os.Getpid())
+func getCmdLine(pid int) []byte {
+	data, err := unix.SysctlRaw("kern.procargs2", pid)
 	if err != nil {
+		msg.Printlf(msg.WARN, "unable to do sysctlraw, error: %w", err)
 		if errors.Is(err, syscall.EINVAL) {
 			// sysctl returns "invalid argument" for both "no such process"
 			// and "operation not permitted" errors.
@@ -32,37 +30,36 @@ func getCmdLine() []byte {
 func parseKernProcargs2(data []byte) []byte {
 	// argc
 	if len(data) < 4 {
-		msg.Printlf(msg.WARN, "Invalid kern.procargs2 data")
+		msg.Printlf(msg.WARN, "invalid kern.procargs2 data")
 		return unknownCommand
 	}
-	argc := binary.LittleEndian.Uint32(data)
+	argc := binary.LittleEndian.Uint32(data[:4])
+
+	// The program name starts after first 4 bytes
 	data = data[4:]
 
-	// exe
-	lines := strings.Split(string(data), "\x00")
-	exe := lines[0]
-	lines = lines[1:]
+	lines := bytes.Split(data, []byte{0})
+	result := bytes.Buffer{}
+	count := uint32(0)
 
-	// Skip nulls that may be appended after the exe.
-	for len(lines) > 0 {
-		if lines[0] != "" {
-			break
+	for _, line := range lines {
+		// data is expected to contain series of nulls, which could be skipped
+		if len(line) != 0 {
+			// we need program name + argc number of tokens
+			if count < argc {
+				result.Write(line)
+				result.WriteByte(' ')
+				count++
+			} else {
+				result.Write(line)
+				break
+			}
 		}
-		lines = lines[1:]
 	}
 
-	// argv
-	if c := min(argc, uint32(len(lines))); c > 0 {
-		exe += " "
-		exe += strings.Join(lines[:c], " ")
+	if result.Len() == 0 {
+		return unknownCommand
 	}
 
-	return []byte(exe)
-}
-
-func min(a, b uint32) uint32 {
-	if a < b {
-		return a
-	}
-	return b
+	return result.Bytes()
 }

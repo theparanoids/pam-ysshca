@@ -6,24 +6,30 @@ package pam
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/theparanoids/pam-ysshca/msg"
 )
 
-func getCmdLine() []byte {
-	cmd, err := ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", os.Getpid()))
+func getCmdLine(pid int) []byte {
+	return getProcCmdLine(fmt.Sprintf("/proc/%d/cmdline", pid))
+}
+
+func getProcCmdLine(fname string) []byte {
+	cmd, err := os.ReadFile(fname)
 	if err != nil {
-		cmd = []byte("unknown command")
-		msg.Printlf(msg.WARN, "Failed to read /proc/%d/cmdline: %v", os.Getpid(), err)
-	} else if len(cmd) == 0 {
-		cmd = []byte("empty command")
-		msg.Printlf(msg.WARN, "/proc/%d/cmdline is empty", os.Getpid())
+		msg.Printlf(msg.WARN, "failed to read file: %q, err: %w", fname, err)
+		return unknownCommand
+	}
+
+	if len(cmd) == 0 {
+		msg.Printlf(msg.WARN, "file: %q is empty", fname)
+		return unknownCommand
 	}
 
 	// Remove '\0' at the end.
-	cmd = cmd[:len(cmd)-1]
+	cmd = bytes.TrimSuffix(cmd, []byte{0})
+
 	// Replace '\0' with ' '.
 	cmd = bytes.Replace(cmd, []byte{0}, []byte{' '}, -1)
 
