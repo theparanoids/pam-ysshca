@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/theparanoids/ysshra v0.0.13
-	golang.org/x/crypto v0.21.0
-	golang.org/x/sys v0.18.0
+	golang.org/x/crypto v0.22.0
+	golang.org/x/sys v0.19.0
 )
 
 require (
