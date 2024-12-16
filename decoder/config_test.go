@@ -4,14 +4,14 @@
 package decoder
 
 import (
-	"io/ioutil"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
 )
 
 func loadFile(t *testing.T, filename string) []byte {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		t.Fatal(err)
 	}

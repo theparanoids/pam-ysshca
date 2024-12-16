@@ -8,7 +8,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -102,7 +102,7 @@ func TestGetIdentitiesFromSSHAgent(t *testing.T) {
 func TestGetValidStaticKeys(t *testing.T) {
 	t.Parallel()
 	// Customize config file for tests.
-	tmp, err := ioutil.TempFile(t.TempDir(), "statickeys")
+	tmp, err := os.CreateTemp(t.TempDir(), "statickeys")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,7 +125,7 @@ func TestGetValidStaticKeys(t *testing.T) {
 		out += fmt.Sprint(string(ssh.MarshalAuthorizedKey(p)))
 	}
 	// Write keys to the static key file.
-	if err := ioutil.WriteFile(tmp.Name(), []byte(out), 0644); err != nil {
+	if err := os.WriteFile(tmp.Name(), []byte(out), 0644); err != nil {
 		t.Fatal(err)
 	}
 	// Get all identities from the current ssh-agent.
@@ -149,7 +149,7 @@ func TestGetValidStaticKeys(t *testing.T) {
 	for _, id := range pubkeys {
 		gotKeys += fmt.Sprintln(id)
 	}
-	wantKeys, err := ioutil.ReadFile(tmp.Name())
+	wantKeys, err := os.ReadFile(tmp.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +203,7 @@ func TestGetValidCertificates(t *testing.T) {
 	addedCerts := testCerts(t)
 	addKeys(t, sshagent, addedCerts)
 
-	tmp, err := ioutil.TempFile(t.TempDir(), "pam-sshca-unit-test")
+	tmp, err := os.CreateTemp(t.TempDir(), "pam-sshca-unit-test")
 	if err != nil {
 		t.Fatal(err)
 	}

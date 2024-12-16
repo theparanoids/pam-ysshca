@@ -5,7 +5,7 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -65,7 +65,7 @@ func (a *aprilFoolFilter) Filter(input []byte) []byte {
 
 func main() {
 	filter := NewAprilFoolFilter(time.Now)
-	in, err := ioutil.ReadAll(os.Stdin)
+	in, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatalf("failed to read from stdin, %v", err)
 	}

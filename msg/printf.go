@@ -56,6 +56,15 @@ func (m *msg) printf(str string, objs ...interface{}) {
 	fmt.Fprintf(m.out, "%v", output)
 }
 
+// Print prints the given string on the terminals to user.
+func Print(str string) {
+	m.print(str)
+}
+
+func (m *msg) print(str string) {
+	fmt.Fprint(m.out, str)
+}
+
 // Printlf prints formatted strings with a message level prefix on the terminals to user.
 func Printlf(level Level, str string, objs ...interface{}) {
 	m.printlf(level, str, objs...)

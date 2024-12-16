@@ -4,7 +4,7 @@
 package filter
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -13,7 +13,7 @@ import (
 
 func TestCommandFilter_Filter(t *testing.T) {
 	if os.Getenv("RUN_CMD") == "1" {
-		b, err := ioutil.ReadAll(os.Stdin)
+		b, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			os.Exit(1)
 		}
