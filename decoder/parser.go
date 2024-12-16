@@ -68,7 +68,7 @@ func (p *parser) parseStart() StateFn {
 	case tokenEOF:
 		return nil
 	default:
-		p.raiseErrorf(tok, fmt.Sprintf("unexpected token %q\n", tok))
+		p.raiseErrorf(tok, "unexpected token %q\n", tok)
 	}
 	return nil
 }

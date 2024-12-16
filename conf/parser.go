@@ -4,7 +4,6 @@
 package conf
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -30,7 +29,7 @@ func NewParser(userName, userHome string) *Parser {
 
 // ParseConfigFile reads the content in a file and parse the directives in it.
 func (p *Parser) ParseConfigFile(path string) Config {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		msg.Printlf(msg.WARN, "Cannot access config file %s: %v", path, err)
 		return defaultConfig()

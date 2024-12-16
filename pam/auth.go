@@ -57,7 +57,7 @@ func (a *authenticator) authCertificate(ag agent.Agent, identities []ssh.PublicK
 				continue
 			}
 			challenge = func(ag agent.Agent, key ssh.PublicKey) error {
-				msg.Printf(prompt.Message)
+				msg.Print(prompt.Message)
 				defer msg.Printf("\n")
 				return sshagent.ChallengeSSHAgent(ag, key)
 			}

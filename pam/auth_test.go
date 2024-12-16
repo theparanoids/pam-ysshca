@@ -6,7 +6,7 @@ package pam
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -37,7 +37,7 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 				}
 
 				// Customize config file for tests.
-				staticKeysFile, err := ioutil.TempFile(t.TempDir(), "statickeys")
+				staticKeysFile, err := os.CreateTemp(t.TempDir(), "statickeys")
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -47,7 +47,7 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if err := ioutil.WriteFile(staticKeysFile.Name(), ssh.MarshalAuthorizedKey(p), 0644); err != nil {
+				if err := os.WriteFile(staticKeysFile.Name(), ssh.MarshalAuthorizedKey(p), 0644); err != nil {
 					t.Fatal(err)
 				}
 				return p, sshAgent, conf.Config{
@@ -70,12 +70,12 @@ func Test_authenticator_authStaticKey(t *testing.T) {
 				}
 
 				// Customize config file for tests.
-				staticKeysFile, err := ioutil.TempFile(t.TempDir(), "statickeys")
+				staticKeysFile, err := os.CreateTemp(t.TempDir(), "statickeys")
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if err := ioutil.WriteFile(staticKeysFile.Name(), []byte("no valid keys in static keys file"), 0644); err != nil {
+				if err := os.WriteFile(staticKeysFile.Name(), []byte("no valid keys in static keys file"), 0644); err != nil {
 					t.Fatal(err)
 				}
 				return nil, sshAgent, conf.Config{
@@ -150,7 +150,7 @@ func Test_authenticator_authCertificate(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				caKeyFile, err := ioutil.TempFile(t.TempDir(), "test-ca-keys-file")
+				caKeyFile, err := os.CreateTemp(t.TempDir(), "test-ca-keys-file")
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -198,7 +198,7 @@ func Test_authenticator_authCertificate(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				caKeyFile, err := ioutil.TempFile(t.TempDir(), "test-ca-keys-file")
+				caKeyFile, err := os.CreateTemp(t.TempDir(), "test-ca-keys-file")
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -6,7 +6,7 @@ package conf
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 
@@ -82,7 +82,7 @@ func (c *Config) AuthorizedPrincipals(username string) (principals map[string]bo
 	}
 
 	for _, authorizedPrincipalsFile := range c.authorizedPrincipalFiles {
-		data, err := ioutil.ReadFile(authorizedPrincipalsFile)
+		data, err := os.ReadFile(authorizedPrincipalsFile)
 		if err != nil {
 			return principals, err
 		}
