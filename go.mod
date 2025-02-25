@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.1
 
 require (
-	github.com/theparanoids/ysshra v0.0.18
+	github.com/theparanoids/ysshra v0.0.19
 	golang.org/x/crypto v0.35.0
 	golang.org/x/sys v0.30.0
 )
