@@ -54,7 +54,7 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Set correct version of Golang to use during CodeQL run
-      uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
       with:
         go-version: '1.19.4'
         check-latest: true
