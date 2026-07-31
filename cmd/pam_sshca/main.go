@@ -29,10 +29,23 @@ func AuthenticateWithCryptoAuth(user string, config conf.Config, sysLogger *sysl
 		return fmt.Errorf("no valid ca keys from %v", config.CAKeys)
 	}
 
-	checker := cert.CreateCertChecker(caKeys)
+	certChecker := cert.CreateCertChecker(caKeys)
+
+	// Apply the same certificate filters as the ssh-agent path so the cryptoauth
+	// fallback enforces identical certificate restrictions (e.g. sudo-filter-regular
+	// rejecting SSH-only certificates). Without this, the fallback would accept
+	// certificates the normal ssh-agent path rejects.
+	var filterCheckers []cryptoauth.Checker
+	for _, filterPath := range config.Filters {
+		flt, err := pam.ResolveFilter(filterPath)
+		if err != nil {
+			return fmt.Errorf("failed to resolve filter %q: %v", filterPath, err)
+		}
+		filterCheckers = append(filterCheckers, filter.NewCertChecker(flt))
+	}
 
 	// TODO: Add crypto-client arguments after we opensource sshca-client.
-	auth := cryptoauth.NewAuthenticator(config, "", checker)
+	auth := cryptoauth.NewAuthenticator(config, "", certChecker, filterCheckers...)
 	return auth.Authenticate(user, sysLogger)
 }
 
