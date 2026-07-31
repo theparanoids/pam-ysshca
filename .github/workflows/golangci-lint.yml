@@ -26,7 +26,9 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Install required packages
-        run: sudo apt-get install -y libpam0g-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpam0g-dev
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
