@@ -21,9 +21,11 @@ const (
 	challengeResponsePrompt = "Paste signed response from client: "
 )
 
-// checker is the interface to check whether an SSH certificate is valid or not.
-// Caller can add additional cert checkers into the Authenticator.
-type checker interface {
+// Checker is the interface to check whether an SSH certificate is valid or not.
+// Caller can add additional cert checkers into the Authenticator to enforce
+// restrictions beyond the CA signature (e.g. certificate usage filters), so that
+// the cryptoauth fallback path stays in parity with the ssh-agent path.
+type Checker interface {
 	CheckCert(cert *ssh.Certificate, principal string) error
 }
 
@@ -32,12 +34,12 @@ type Authenticator struct {
 	*ssh.CertChecker
 	prompter               *msg.Prompter
 	clientArgs             string
-	additionalCertCheckers []checker
+	additionalCertCheckers []Checker
 	userCAKeysFiles        []string
 }
 
 // NewAuthenticator returns a new Authenticator.
-func NewAuthenticator(config conf.Config, clientArgs string, certChecker *ssh.CertChecker, additionalCertCheckers ...checker) *Authenticator {
+func NewAuthenticator(config conf.Config, clientArgs string, certChecker *ssh.CertChecker, additionalCertCheckers ...Checker) *Authenticator {
 	auth := &Authenticator{
 		CertChecker:            certChecker,
 		prompter:               msg.NewPrompter(),

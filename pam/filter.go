@@ -12,16 +12,18 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func invokeFilter(keys []ssh.PublicKey, filterPath string) []ssh.PublicKey {
-	var (
-		flt filter.Doer
-		err error
-	)
+// ResolveFilter resolves a filter path to a filter Doer. It supports embedded
+// filters registered via AddFilter (referenced with the "embedded:" prefix) and
+// external command filters referenced by their executable path.
+func ResolveFilter(filterPath string) (filter.Doer, error) {
 	if strings.HasPrefix(filterPath, filter.EmbeddedPrefix) {
-		flt, err = Filter(strings.TrimPrefix(filterPath, filter.EmbeddedPrefix))
-	} else {
-		flt, err = filter.NewCommandFilter(filterPath)
+		return Filter(strings.TrimPrefix(filterPath, filter.EmbeddedPrefix))
 	}
+	return filter.NewCommandFilter(filterPath)
+}
+
+func invokeFilter(keys []ssh.PublicKey, filterPath string) []ssh.PublicKey {
+	flt, err := ResolveFilter(filterPath)
 	if err != nil {
 		msg.Printlf(msg.WARN, "failed to lookup filter %s: %v", filterPath, err)
 		return []ssh.PublicKey{}
