@@ -1,7 +1,7 @@
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
-github.com/theparanoids/ysshra v0.0.19 h1:kQvR83Qj87DfWd7g5Q/lGvLk0FQgVejZUFKOFU5jTwo=
-github.com/theparanoids/ysshra v0.0.19/go.mod h1:c54mrJoK9k/1BKra4SJqbshTALpO/Owu4dAPCA9cp0k=
+github.com/theparanoids/ysshra v0.0.23 h1:hjebnDVOM+Z6Co7TQoXneEvyzAVFFvp1xn+ENgDRKzU=
+github.com/theparanoids/ysshra v0.0.23/go.mod h1:RcnjpqQUEHCwYZ+IwIxB9MdU1F0Pa1aGTkUs3W2T+bE=
 golang.org/x/crypto v0.48.0 h1:/VRzVqiRSggnhY7gNRxPauEQ5Drw9haKdM0jqfcCFts=
 golang.org/x/crypto v0.48.0/go.mod h1:r0kV5h3qnFPlQnBSrULhlsRfryS2pmewsg+XfMgkVos=
 golang.org/x/sys v0.41.0 h1:Ivj+2Cp/ylzLiEU89QhWblYnOE9zerudt9Ftecq2C6k=
