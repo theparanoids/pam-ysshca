@@ -3,7 +3,7 @@ module github.com/theparanoids/pam-ysshca
 go 1.24.0
 
 require (
-	github.com/theparanoids/ysshra v0.0.19
+	github.com/theparanoids/ysshra v0.0.23
 	golang.org/x/crypto v0.48.0
 	golang.org/x/sys v0.41.0
 )
