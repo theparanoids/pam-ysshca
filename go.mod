@@ -1,11 +1,11 @@
 module github.com/theparanoids/pam-ysshca
 
-go 1.24.0
+go 1.26.0
 
 require (
 	github.com/theparanoids/ysshra v0.0.19
 	golang.org/x/crypto v0.48.0
-	golang.org/x/sys v0.41.0
+	golang.org/x/sys v0.49.0
 )
 
 require github.com/Microsoft/go-winio v0.6.2 // indirect
