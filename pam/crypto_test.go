@@ -51,6 +51,7 @@ func testCerts(t *testing.T) []agent.AddedKey {
 			continue
 		}
 		cert := &ssh.Certificate{
+			CertType:        ssh.UserCert,
 			Key:             public,
 			ValidPrincipals: []string{fmt.Sprintf("%d", i)},
 			ValidAfter:      uint64(time.Now().Unix() + (i-4)*3600),
@@ -241,5 +242,79 @@ func TestGetValidCertificates(t *testing.T) {
 		if i == 4 && len(certs) != 1 {
 			t.Fatalf("Failed to get valid certificates: %v", certs)
 		}
+	}
+}
+
+func TestGetValidCertificatesRejectsHostCert(t *testing.T) {
+	t.Parallel()
+	signkey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signer, err := ssh.NewSignerFromKey(signkey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sshagent := agent.NewKeyring()
+	now := time.Now().Unix()
+
+	makeCert := func(certType uint32, principal string) agent.AddedKey {
+		priv, err := rsa.GenerateKey(rand.Reader, 2048)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pub, err := ssh.NewPublicKey(priv.Public())
+		if err != nil {
+			t.Fatal(err)
+		}
+		c := &ssh.Certificate{
+			CertType:        certType,
+			Key:             pub,
+			ValidPrincipals: []string{principal},
+			ValidAfter:      uint64(now - 60),
+			ValidBefore:     uint64(now + 3600),
+		}
+		if err := c.SignCert(rand.Reader, signer); err != nil {
+			t.Fatal(err)
+		}
+		return agent.AddedKey{PrivateKey: priv, Certificate: c}
+	}
+
+	hostCertKey := makeCert(ssh.HostCert, "alice")
+	userCertKey := makeCert(ssh.UserCert, "alice")
+	addKeys(t, sshagent, []agent.AddedKey{hostCertKey, userCertKey})
+
+	tmp, err := os.CreateTemp(t.TempDir(), "pam-sshca-certtype-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tmp.Write(ssh.MarshalAuthorizedKey(signer.PublicKey())); err != nil {
+		t.Fatal(err)
+	}
+
+	a := &authenticator{
+		config: &conf.Config{
+			AllowCertificate: true,
+			CAKeys:           []string{tmp.Name()},
+		},
+	}
+
+	// HostCert alone must be rejected even with trusted CA and matching principal.
+	if got := a.getValidCertificates([]ssh.PublicKey{hostCertKey.Certificate}, "alice"); len(got) != 0 {
+		t.Fatalf("Expected HostCert to be rejected, got %d valid certificate(s)", len(got))
+	}
+
+	// When both HostCert and UserCert are present in ssh-agent, only UserCert is returned.
+	identities, err := getIdentitiesFromSSHAgent(sshagent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	validCerts := a.getValidCertificates(identities, "alice")
+	if len(validCerts) != 1 {
+		t.Fatalf("Expected 1 valid UserCert, got %d", len(validCerts))
+	}
+	if validCerts[0].CertType != ssh.UserCert {
+		t.Fatalf("Expected CertType == ssh.UserCert (%d), got %d", ssh.UserCert, validCerts[0].CertType)
 	}
 }
