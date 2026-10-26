@@ -131,6 +131,12 @@ func (a *authenticator) getValidCertificates(identities []ssh.PublicKey, usernam
 			continue
 		}
 
+		// Ensure the certificate is an SSH user certificate.
+		if cert.CertType != ssh.UserCert {
+			msg.Printlf(msg.DEBUG, "Identity %d is not a user certificate (type %d), ignore.", index, cert.CertType)
+			continue
+		}
+
 		// Check the signing CA of the certificate.
 		if !CAKeyMap.contains(cert.SignatureKey) {
 			msg.Printlf(msg.DEBUG, "Identity %d is signed by untrusted CA.", index)
